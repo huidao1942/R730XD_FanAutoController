@@ -1,9 +1,9 @@
 import subprocess
 import time
 
-IDRAC_IP = '192.168.5.253'
-USERNAME = 'root'
-PASSWORD = 'Qq1293258904..'
+IDRAC_IP = 'idracip地址'
+USERNAME = 'idrac用户名'
+PASSWORD = 'idrac密码'
 
 def get_gpu_temperature():
     result = subprocess.run(['nvidia-smi', '--query-gpu=temperature.gpu', '--format=csv,noheader'], capture_output=True, text=True)
