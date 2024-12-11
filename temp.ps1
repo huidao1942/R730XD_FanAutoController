@@ -1,40 +1,40 @@
-# ¶¨ÒåIDRACµÄIPµØÖ·¡¢ÓÃ»§ÃûºÍÃÜÂë
-$IDRAC_IP = '192.168.5.253'
-$USERNAME = 'root'
-$PASSWORD = 'Qq1293258904..'
+# å®šä¹‰IDRACçš„IPåœ°å€ã€ç”¨æˆ·åå’Œå¯†ç 
+$IDRAC_IP = 'idracçš„ipåœ°å€'
+$USERNAME = 'ç”¨æˆ·å'
+$PASSWORD = 'å¯†ç '
 
-# º¯Êı£º»ñÈ¡GPUÎÂ¶È
+# å‡½æ•°ï¼šè·å–GPUæ¸©åº¦
 function Get-GpuTemperature {
     $result = & nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader
     if ($LASTEXITCODE -eq 0) {
         return [float]($result.Trim())
     } else {
-        Write-Output '»ñÈ¡ÏÔ¿¨ÎÂ¶ÈÊ§°Ü'
+        Write-Output 'è·å–æ˜¾å¡æ¸©åº¦å¤±è´¥'
         return $null
     }
 }
 
-# º¯Êı£ºÉèÖÃ·çÉÈËÙ¶È
+# å‡½æ•°ï¼šè®¾ç½®é£æ‰‡é€Ÿåº¦
 function Set-FanSpeed([int]$speed) {
     if ($speed -ge 100 -or $speed -le 10) {
-        Write-Output "·Ç·¨²Ù×÷·çÉÈ"
+        Write-Output "éæ³•æ“ä½œé£æ‰‡"
     } else {
         $hexSpeed = '{0:x2}' -f $speed
         $args = @('-I', 'lanplus', '-H', $IDRAC_IP, '-U', $USERNAME, '-P', $PASSWORD, 'raw', '0x30', '0x30', '0x02', '0xff', "0x$hexSpeed")
         $result = & ipmitool @args 2>&1
         if ($LASTEXITCODE -eq 0) {
-            Write-Output "·çÉÈ×ªËÙµ÷ÕûÖÁ $($speed)%"
+            Write-Output "é£æ‰‡è½¬é€Ÿè°ƒæ•´è‡³ $($speed)%"
         } else {
-            Write-Output "·çÉÈ×ªËÙµ÷ÕûÊ§°Ü£º: $result"
+            Write-Output "é£æ‰‡è½¬é€Ÿè°ƒæ•´å¤±è´¥ï¼š: $result"
         }
     }
 }
 
-# Ö÷º¯Êı£ºÑ­»·¼à¿ØGPUÎÂ¶È²¢µ÷Õû·çÉÈËÙ¶È
+# ä¸»å‡½æ•°ï¼šå¾ªç¯ç›‘æ§GPUæ¸©åº¦å¹¶è°ƒæ•´é£æ‰‡é€Ÿåº¦
 while ($true) {
     $gpuTemp = Get-GpuTemperature
     if ($gpuTemp -ne $null) {
-        Write-Output "ÏÔ¿¨ÎÂ¶ÈÎª: $($gpuTemp)¡ãC"
+        Write-Output "æ˜¾å¡æ¸©åº¦ä¸º: $($gpuTemp)Â°C"
         if ($gpuTemp -gt 80) {
             Set-FanSpeed -speed 80
         } elseif ($gpuTemp -gt 75) {
@@ -49,5 +49,5 @@ while ($true) {
             Set-FanSpeed -speed 20
         }
     }
-    Start-Sleep -Seconds 5 # Ã¿5Ãë¼ì²éÒ»´Î
+    Start-Sleep -Seconds 5 # æ¯5ç§’æ£€æŸ¥ä¸€æ¬¡
 }
